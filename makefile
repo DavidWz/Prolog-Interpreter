@@ -2,10 +2,10 @@ CC = gcc
 CXX = g++
 RM = rm -f
 DEBUG = -Wall
-CPPFLAGS = -g -O3 -c -std=gnu++11 $(DEBUG)
+CPPFLAGS = -g -O3 -c -std=c++14 $(DEBUG)
 LDFLAGS = -g $(Debug)
 
-SRCS = Main.cpp Parser.cpp
+SRCS = Main.cpp Parser.cpp Interpreter.cpp Substitution.cpp
 OBJS = $(subst .cpp,.o,$(SRCS))
 
 all: HaskellInterpreter

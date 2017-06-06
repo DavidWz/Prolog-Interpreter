@@ -36,14 +36,7 @@ public:
     void print(std::ostream& os) const {
         os << mName;
         if (!mExpressions.empty()) {
-            os << "(";
-            for (int i = 0; i < (int) mExpressions.size(); i++) {
-                os << *(mExpressions[i]);
-                if (i < (int) mExpressions.size()-1) {
-                    os << ", ";
-                }
-            }
-            os << ")";
+            os << "(" << mExpressions << ")";
         }
     }
 };

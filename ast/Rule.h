@@ -35,13 +35,7 @@ public:
     friend inline std::ostream& operator <<(std::ostream& os, const Rule& rule) {
         os << *(rule.mLhs);
         if (!rule.mRhs.empty()) {
-            os << " :- ";
-            for (int i = 0; i < (int) rule.mRhs.size(); i++) {
-                os << *(rule.mRhs[i]);
-                if (i < (int) rule.mRhs.size() - 1) {
-                    os << ", ";
-                }
-            }
+            os << " :- " << rule.mRhs;
         }
         os << ".";
         return os;

@@ -22,15 +22,20 @@ private:
 
 public:
     Parser(std::ifstream& stream);
+    Parser(const std::string& input);
 
-    /**
-     * Parses a file into an AST structure.
-     */
-    std::shared_ptr<Program> parse();
+    std::shared_ptr<Program> parseProgram();
+    ExpsT parseQuery();
 
     bool isSuccessful() const;
 
 private:
+    std::shared_ptr<Rule> parseRule();
+    std::shared_ptr<Expression> parseExpression();
+    ExpsT parseExpressions();
+    std::shared_ptr<Function> parseFunction();
+    std::shared_ptr<Variable> parseVariable();
+
     // skips whitespaces etc
     void skipIgnoredChars();
 
@@ -48,10 +53,4 @@ private:
 
     // aborts parsing with the given error message
     void fail(std::string msg);
-
-    std::shared_ptr<Rule> parseRule();
-    std::shared_ptr<Expression> parseExpression();
-    std::vector<std::shared_ptr<Expression>> parseExpressions();
-    std::shared_ptr<Function> parseFunction();
-    std::shared_ptr<Variable> parseVariable();
 };

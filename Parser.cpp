@@ -10,6 +10,13 @@ Parser::Parser(std::ifstream& stream) :
 {
 }
 
+Parser::Parser(const std::string& input) :
+    mContent(input),
+    mPos(0),
+    mIsSuccessful(true)
+{
+}
+
 void Parser::skipIgnoredChars() {
     while (mPos < (int) mContent.size() && isspace(mContent[mPos])) {
         mPos++;
@@ -58,14 +65,12 @@ bool Parser::hasNext() const {
 void Parser::fail(std::string msg) {
     if (mIsSuccessful) {
         std::cerr << msg << std::endl;
-        std::cerr << "\taround " << mContent.substr(mPos, std::min(mPos, (int)mContent.size() - mPos)) << std::endl;
-
         mIsSuccessful = false;
         mPos = mContent.size(); 
     }
 }
 
-std::shared_ptr<Program> Parser::parse() {
+std::shared_ptr<Program> Parser::parseProgram() {
     skipIgnoredChars();
 
     std::vector<std::shared_ptr<Rule>> rules;
@@ -118,7 +123,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
     return exp;
 }
 
-std::vector<std::shared_ptr<Expression>> Parser::parseExpressions() {
+ExpsT Parser::parseExpressions() {
     skipIgnoredChars();
 
     std::vector<std::shared_ptr<Expression>> exps;
@@ -129,6 +134,16 @@ std::vector<std::shared_ptr<Expression>> Parser::parseExpressions() {
         consume(',');
         exps.push_back(parseExpression());
     }
+
+    return exps;
+}
+
+ExpsT Parser::parseQuery() {
+    skipIgnoredChars();
+
+    ExpsT exps = parseExpressions();
+    skipIgnoredChars();
+    consume('.');
 
     return exps;
 }
