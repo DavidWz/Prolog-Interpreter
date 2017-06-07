@@ -29,4 +29,20 @@ public:
     void print(std::ostream& os) const {
         os << mName;
     }
+
+    bool operator==(const Variable& other) const {
+        return (mName == other.mName);
+    }
 };
+
+namespace std {
+    template <>
+    struct hash<Variable> {
+        std::size_t operator()(const Variable& var) const {
+            using std::size_t;
+            using std::hash;
+            using std::string;
+            return hash<string>()(var.getName());
+        }
+    };
+}

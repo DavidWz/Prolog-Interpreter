@@ -8,10 +8,10 @@ LDFLAGS = -g $(Debug)
 SRCS = Main.cpp Parser.cpp Interpreter.cpp Substitution.cpp
 OBJS = $(subst .cpp,.o,$(SRCS))
 
-all: HaskellInterpreter
+all: PrologInterpreter
 
-HaskellInterpreter: $(OBJS)
-	$(CXX) $(LDFLAGS) -o HaskellInterpreter $(OBJS)
+PrologInterpreter: $(OBJS)
+	$(CXX) $(LDFLAGS) -o PrologInterpreter $(OBJS)
 
 depend: .depend
 

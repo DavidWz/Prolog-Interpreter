@@ -33,7 +33,7 @@ std::experimental::optional<Substitution> Interpreter::evaluate(ExpsT query) {
                 negativeClause = unify(negativeClause, definiteClause->getRhs(), *mgu);
 
                 // update answer
-                answer = answer.apply(*mgu);
+                answer.apply(*mgu);
 
                 break;
             }
