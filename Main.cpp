@@ -50,8 +50,7 @@ int main(int argc, const char* argv[]) {
             if (queryParser.isSuccessful()) {
                 std::experimental::optional<Substitution> answer = interpreter.evaluate(query);
                 if (answer) {
-                    //std::cout << *answer << std::endl;
-                    std::cout << "True." << std::endl;
+                    std::cout << *answer << std::endl;
                 }
                 else {
                     std::cout << "False." << std::endl;

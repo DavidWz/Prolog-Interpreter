@@ -20,5 +20,8 @@ public:
     std::experimental::optional<Substitution> evaluate(ExpsT query);
 
 private:
-    ExpsT unify(ExpsT left, ExpsT right, Substitution mgu);
+    /**
+     * Applies mgu to left and right expressions and returns a list containing both. 
+     */
+    ExpsT unify(const ExpsT& left, const ExpsT& right, const Substitution& mgu);
 };

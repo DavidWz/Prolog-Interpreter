@@ -32,6 +32,15 @@ public:
         return mRhs;
     }
 
+    std::set<std::string> getVariableNames() const {
+        std::set<std::string> vars = mLhs->getVariableNames();
+        for (auto exp : mRhs) {
+            std::set<std::string> expVars = exp->getVariableNames();
+            vars.insert(expVars.begin(), expVars.end());
+        }
+        return vars;
+    }
+
     friend inline std::ostream& operator <<(std::ostream& os, const Rule& rule) {
         os << *(rule.mLhs);
         if (!rule.mRhs.empty()) {

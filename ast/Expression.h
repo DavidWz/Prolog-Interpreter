@@ -8,7 +8,16 @@
  */
 class Expression {
 public:
-    virtual void print(std::ostream& os) const = 0;
+    virtual bool contains(const std::string& var) const = 0;
+    virtual std::set<std::string> getVariableNames() const = 0;
+
+    bool operator==(const Expression& other) const {
+        return this->equals(other);
+    }
+
+    bool operator!=(const Expression& other) const {
+        return !this->equals(other);
+    }
 
     friend inline std::ostream& operator <<(std::ostream& os, const Expression& exp) {
         exp.print(os);
@@ -24,4 +33,8 @@ public:
         }
         return os;
     }
+
+protected:
+    virtual void print(std::ostream& os) const = 0;
+    virtual bool equals(const Expression& other) const = 0;
 };
