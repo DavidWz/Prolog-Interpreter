@@ -8,6 +8,6 @@ Rule = Exp (":-" Exps)? "."
 Exps = Exp ("," Exp)*
 Exp = Var | Func
 
-Func = FuncName "(" Exps ")"
+Func = FuncName ("(" Exps ")")?
 Var = [A-Z][a-zA-Z0-9]*
 FuncName = [a-z][a-zA-Z0-9]*
