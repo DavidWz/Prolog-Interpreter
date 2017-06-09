@@ -8,4 +8,4 @@
 #include <set>
     
 #define ExpsT std::vector<std::shared_ptr<Expression>>
-#define DEBUG
+//#define DEBUG

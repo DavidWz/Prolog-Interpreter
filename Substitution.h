@@ -21,7 +21,7 @@ public:
     std::shared_ptr<Expression> applyTo(std::shared_ptr<Variable> var) const;
     std::shared_ptr<Expression> applyTo(std::shared_ptr<Function> func) const;
 
-    void apply(const Substitution& other);
+    Substitution apply(const Substitution& other) const;
 
     static std::experimental::optional<Substitution> getMGU(std::shared_ptr<Expression> left, std::shared_ptr<Expression> right);
     static std::experimental::optional<Substitution> getMGU(std::shared_ptr<Function> left, std::shared_ptr<Function> right);

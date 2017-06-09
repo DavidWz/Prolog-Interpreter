@@ -10,13 +10,19 @@
 class VariablePool {
 private:
     std::set<std::string> mNames;
+
     int mMaxVarIndex;
     std::string mFreshName;
+
+    int mLockedMaxVarIndex;
+    std::string mLockedFreshName;
 
     VariablePool() :
         mNames(),
         mMaxVarIndex(0),
-        mFreshName("X0")
+        mFreshName("X0"),
+        mLockedMaxVarIndex(0),
+        mLockedFreshName("X0")
     {
     }
 
@@ -57,5 +63,22 @@ public:
 
     static std::string getFreshName() {
         return getInstance().mFreshName;
+    }
+
+    static void rememberState() {
+        getInstance().mLockedMaxVarIndex = getInstance().mMaxVarIndex;
+        getInstance().mLockedFreshName = getInstance().mFreshName;
+    }
+
+    static void resetToRememberedState() {
+        getInstance().mMaxVarIndex = getInstance().mLockedMaxVarIndex;
+        getInstance().mFreshName = getInstance().mLockedFreshName;
+    }
+
+    static void reset() {
+        getInstance().mMaxVarIndex = 0;
+        getInstance().mLockedMaxVarIndex = 0;
+        getInstance().mFreshName = "X0";
+        getInstance().mLockedFreshName = "X0";
     }
 };

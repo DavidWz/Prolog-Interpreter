@@ -59,10 +59,15 @@ std::shared_ptr<Expression> Substitution::applyTo(std::shared_ptr<Function> func
     return std::make_shared<Function>(func->getName(), exps);
 }
 
-void Substitution::apply(const Substitution& other) {
+Substitution Substitution::apply(const Substitution& other) const {
+    Substitution result;
+    for (auto mapEntry : mVarMap) {
+        result.set(mapEntry.first, mapEntry.second);
+    }
     for (auto mapEntry : other.mVarMap) {
-        set(mapEntry.first, mapEntry.second);
-    }   
+        result.set(mapEntry.first, mapEntry.second);
+    }
+    return result;
 }
 
 std::experimental::optional<Substitution> Substitution::getMGU(std::shared_ptr<Expression> left, std::shared_ptr<Expression> right) {
@@ -136,7 +141,7 @@ std::experimental::optional<Substitution> Substitution::getMGU(std::shared_ptr<F
 #ifdef DEBUG
                 std::cout << "\tApplying " << *tmp << " to " << s << std::endl;
 #endif
-                s.apply(*tmp);
+                s = s.apply(*tmp);
 #ifdef DEBUG
                 std::cout << "\tResulting mgu: " << s << std::endl;
 #endif

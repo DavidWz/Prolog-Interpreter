@@ -17,11 +17,19 @@ public:
      * @param query the query that should be evaluated
      * @return the answer substitution if the query is true, empty otherwise
      */
-    std::experimental::optional<Substitution> evaluate(ExpsT query);
+    std::experimental::optional<Substitution> evaluate(const ExpsT& query) const;
 
 private:
     /**
      * Applies mgu to left and right expressions and returns a list containing both. 
      */
-    ExpsT unify(const ExpsT& left, const ExpsT& right, const Substitution& mgu);
+    ExpsT unify(const ExpsT& left, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& right, const Substitution& mgu) const;
+
+    /**
+     * Evaluates the given query assuming a previous answer substitution.
+     * @param query the query
+     * @param currentAnswer the current answer substitution
+     * @return the final answer substitution if the query is true, empty otherwise 
+     */
+    std::experimental::optional<Substitution> evaluate(const ExpsT& query, const Substitution& currentAnswer) const;
 };

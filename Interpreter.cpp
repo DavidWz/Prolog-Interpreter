@@ -23,80 +23,89 @@ std::set<std::string> getVariableNames(const ExpsT& exps) {
     return vars;
 }
 
-std::experimental::optional<Substitution> Interpreter::evaluate(ExpsT query) {
-    ExpsT negativeClause = query;
-    Substitution answer;
+std::experimental::optional<Substitution> Interpreter::evaluate(const ExpsT& query) const {
+    std::experimental::optional<Substitution> answer = evaluate(query, Substitution());
+    
+    if (answer) {
+        // the answer substitution only needs to contain variables from the query
+        std::set<std::string> origVars = getVariableNames(query);
+        return answer->filter(origVars);
+    }
+    else {
+        return answer;
+    }
+}
 
+std::experimental::optional<Substitution> Interpreter::evaluate(const ExpsT& query, const Substitution& currentAnswer) const {
 #ifdef DEBUG
     std::cout << "Evaluating ";
-    printExps(negativeClause);
+    printExps(query);
     std::cout << std::endl;
 #endif
 
-    // try to resolve the query until we get the empty clause
-    while (negativeClause.size() > 0) {
-        std::shared_ptr<Expression> negativeLiteral = negativeClause[0];
+    if (query.size() == 0) {
+        // Empty clause resolved, Done.
+        return std::experimental::optional<Substitution>(currentAnswer);
+    }
+
+    // we simply pick the first literal as the next one to be resolved
+    std::shared_ptr<Expression> negativeLiteral = query[0];
 
 #ifdef DEBUG
-        std::cout << "Current negative clause: ";
-        printExps(negativeClause);
-        std::cout << std::endl;
-        std::cout << "Current answer: " << answer << std::endl;
-        std::cout << "Picked negative literal " << *negativeLiteral << std::endl;
+    std::cout << "Current negative clause: ";
+    printExps(query);
+    std::cout << std::endl;
+    std::cout << "Current answer: " << currentAnswer << std::endl;
+    std::cout << "Picked negative literal " << *negativeLiteral << std::endl;
 #endif
-    
-        // try to resolve the negative clause with a definite program clause
-        bool isUnifiable = false;
-        for (int i = 0; i < (int) mProgram->getRules().size(); i++) {
-            std::shared_ptr<Rule> definiteClause = mProgram->getRules()[i];
-            std::shared_ptr<Expression> positiveLiteral = definiteClause->getLhs();
 
-            Substitution renaming = Substitution::renameVars(definiteClause->getVariableNames());
-            std::shared_ptr<Expression> renamedPositiveLiteral = renaming.applyTo(positiveLiteral);
+    std::experimental::optional<Substitution> finalAnswer;
+
+    // try to resolve the negative clause with a definite program clause
+    for (int i = 0; i < (int) mProgram->getRules().size(); i++) {
+        std::shared_ptr<Rule> definiteClause = mProgram->getRules()[i];
+        std::shared_ptr<Expression> positiveLiteral = definiteClause->getLhs();
+
+        Substitution renaming = Substitution::renameVars(definiteClause->getVariableNames());
+        std::shared_ptr<Expression> renamedPositiveLiteral = renaming.applyTo(positiveLiteral);
 
 #ifdef DEBUG
-            std::cout << "Trying to unify " << *negativeLiteral << " with " << *positiveLiteral << std::endl;
-            std::cout << "Renamed " << *positiveLiteral << " to " << *renamedPositiveLiteral << std::endl;
+        std::cout << "Trying to unify " << *negativeLiteral << " with " << *renamedPositiveLiteral << std::endl;
 #endif
-
-            // if the negative and positive clause are unifiable
-            std::experimental::optional<Substitution> mgu = Substitution::getMGU(negativeLiteral, renamedPositiveLiteral);
-            if (mgu) {
-                isUnifiable = true;
+        // if the negative and positive clause are unifiable
+        std::experimental::optional<Substitution> mgu = Substitution::getMGU(negativeLiteral, renamedPositiveLiteral);
+        if (mgu) {
 #ifdef DEBUG
-                std::cout << "MGU found: " << *mgu << std::endl;
+            std::cout << "MGU found: " << *mgu << std::endl;
 #endif
+            // resolve the clauses
+            ExpsT nextQuery = unify(query, negativeLiteral, renaming.applyTo(definiteClause->getRhs()), *mgu);
 
-                // resolve the clauses
-                auto it = std::find(negativeClause.begin(), negativeClause.end(), negativeLiteral);
-                negativeClause.erase(it);
-                negativeClause = unify(negativeClause, renaming.applyTo(definiteClause->getRhs()), *mgu);
+            // update currentAnswer
+            Substitution nextAnswer = currentAnswer.apply(*mgu);
 
-                // update answer
-                answer.apply(*mgu);
-
+            // put the next configuration on the backtracking stack (i.e. the program stack)
+            std::experimental::optional<Substitution> tmpFinalAnswer = evaluate(nextQuery, nextAnswer);
+            if (tmpFinalAnswer) {
+                // we found a final answer
+                finalAnswer = tmpFinalAnswer;
                 break;
             }
-            else {
-#ifdef DEBUG
-                std::cout << "No MGU found." << std::endl;
-#endif
-                isUnifiable = false;
-            }
         }
-
-        if (!isUnifiable) {
+        else {
 #ifdef DEBUG
-            std::cout << "Could not unify with any clause." << std::endl;
+            std::cout << "No MGU found." << std::endl;
 #endif
-            // return empty indicating not resolvable
-            return std::experimental::optional<Substitution>();
         }
     }
 
-    // the answer substitution only needs to contain variables from the query
-    std::set<std::string> origVars = getVariableNames(query);
-    return answer.filter(origVars);
+    if (!finalAnswer) {
+#ifdef DEBUG
+        std::cout << "Could not unify with any clause." << std::endl;
+#endif
+    }
+    
+    return finalAnswer;
 }
 
 bool contains(const ExpsT& exps, std::shared_ptr<Expression> exp) {
@@ -108,13 +117,15 @@ bool contains(const ExpsT& exps, std::shared_ptr<Expression> exp) {
     return false;
 }
 
-ExpsT Interpreter::unify(const ExpsT& left, const ExpsT& right, const Substitution& mgu) {
+ExpsT Interpreter::unify(const ExpsT& left, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& right, const Substitution& mgu) const {
     ExpsT result;
 
     for (int i = 0; i < (int) left.size(); i++) {
-        std::shared_ptr<Expression> exp = mgu.applyTo(left[i]);
-        if (!contains(result, exp)) {
-            result.push_back(exp);
+        if (left[i] != resolvedLiteral) {
+            std::shared_ptr<Expression> exp = mgu.applyTo(left[i]);
+            if (!contains(result, exp)) {
+                result.push_back(exp);
+            }
         }
     }
     for (int i = 0; i < (int) right.size(); i++) {

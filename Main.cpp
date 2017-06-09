@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "ast/VariablePool.h"
 
 int main(int argc, const char* argv[]) {
     std::shared_ptr<Program> program;
@@ -15,7 +16,9 @@ int main(int argc, const char* argv[]) {
             program = parser.parseProgram();
             inputFileStream.close();
             if (parser.isSuccessful()) {
+#ifdef DEBUG
                 std::cout << *program << std::endl;
+#endif
             }
             else {
                 return 0;
@@ -33,6 +36,7 @@ int main(int argc, const char* argv[]) {
 
     // init interpreter
     Interpreter interpreter(program);
+    VariablePool::rememberState();
 
     // main loop
     bool isRunning = true;
@@ -56,6 +60,7 @@ int main(int argc, const char* argv[]) {
                     std::cout << "False." << std::endl;
                 }
             }
+            VariablePool::resetToRememberedState();
         }
     }
 }
