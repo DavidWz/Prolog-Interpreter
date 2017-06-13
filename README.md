@@ -8,4 +8,4 @@ Some runnable example programs can be found in the `examples` folder.
 Compile the prolog interpreter by simply calling `make`.  
 Then, run the interpreter on a prolog program like so `./PrologInterpreter examples/list.pl`.  
 Within the interpreter, put in queries like so `?- bubbleSort(ls(s(o), ls(o, nil)), X).`  
-Note however, that it currently is not usable for larger programs since it takes a really long time to finish evaluating. 
+You will either get an answer of the form `True. X = ...` or simply `False.`. If there might be additional answers to your query, the interpreter will wait for you to press `,` followed by enter to continue evaluating the query. If you press anything else (e.g. simply pressing enter) the interpreter will stop evaluating that query and wait for your next query. You can quit the program by typing `:quit`.  
