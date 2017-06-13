@@ -86,7 +86,7 @@ std::shared_ptr<Program> Parser::parseProgram() {
 std::shared_ptr<Rule> Parser::parseRule() {
     skipIgnoredChars();
 
-    std::shared_ptr<Expression> lhs = parseExpression();
+    std::shared_ptr<Function> lhs = parseFunction();
     std::vector<std::shared_ptr<Expression>> rhs;
 
     skipIgnoredChars();

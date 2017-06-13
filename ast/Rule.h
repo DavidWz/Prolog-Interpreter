@@ -3,28 +3,29 @@
 #include <iostream>
 #include "../Common.h"
 #include "Expression.h"
+#include "Function.h"
 
 /**
  * A rule consists of a left-hand side expression and possible right-hand side expressions.
  */
 class Rule {
 private:
-    std::shared_ptr<Expression> mLhs;
+    std::shared_ptr<Function> mLhs;
     std::vector<std::shared_ptr<Expression>> mRhs;
 public:
-    Rule(std::shared_ptr<Expression> lhs, const std::vector<std::shared_ptr<Expression>>& rhs) :
+    Rule(std::shared_ptr<Function> lhs, const std::vector<std::shared_ptr<Expression>>& rhs) :
         mLhs(lhs),
         mRhs(rhs)
     {
     }
 
-    Rule(std::shared_ptr<Expression> lhs) :
+    Rule(std::shared_ptr<Function> lhs) :
         mLhs(lhs),
         mRhs()
     {
     }
 
-    std::shared_ptr<Expression> getLhs() const {
+    std::shared_ptr<Function> getLhs() const {
         return mLhs;
     }
 

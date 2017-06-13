@@ -71,42 +71,27 @@ Substitution Substitution::apply(const Substitution& other) const {
 }
 
 std::experimental::optional<Substitution> Substitution::getMGU(std::shared_ptr<Expression> left, std::shared_ptr<Expression> right) {
-#ifdef DEBUG
-    std::cout << "\tmgu(" << *left << ", " << *right  << "):" << std::endl;
-#endif
     if (std::shared_ptr<Variable> leftVar = std::dynamic_pointer_cast<Variable>(left)) {
         if (right->contains(leftVar->getName())) {
             // occur failure
-#ifdef DEBUG
-            std::cout << "\tOccur Failure." << std::endl;
-#endif
             return std::experimental::optional<Substitution>();
         }
         else {
             // var | exp
             Substitution s;
             s.set(leftVar->getName(), right);
-#ifdef DEBUG
-            std::cout << "\tRenaming " << *leftVar << " / " << *right << std::endl;
-#endif
             return s;
         }
     }
     else if (std::shared_ptr<Variable> rightVar = std::dynamic_pointer_cast<Variable>(right)) {
         if (left->contains(rightVar->getName())) {
             // occur failure
-#ifdef DEBUG
-            std::cout << "\tOccur Failure." << std::endl;
-#endif
             return std::experimental::optional<Substitution>();
         }
         else {
             // func | var
             Substitution s;
             s.set(rightVar->getName(), left);
-#ifdef DEBUG
-            std::cout << "\tRenaming " << *rightVar << " / " << *left << std::endl;
-#endif
             return s;
         }
     }
@@ -138,13 +123,7 @@ std::experimental::optional<Substitution> Substitution::getMGU(std::shared_ptr<F
                 right = std::dynamic_pointer_cast<Function>(tmp->applyTo(right));
 
                 // add the mgu to our total substitution
-#ifdef DEBUG
-                std::cout << "\tApplying " << *tmp << " to " << s << std::endl;
-#endif
                 s = s.apply(*tmp);
-#ifdef DEBUG
-                std::cout << "\tResulting mgu: " << s << std::endl;
-#endif
             }
             else {
                 // failure
@@ -156,9 +135,6 @@ std::experimental::optional<Substitution> Substitution::getMGU(std::shared_ptr<F
     }
     else {
         // clash failure
-#ifdef DEBUG
-        std::cout << "\tClash Failure." << std::endl;
-#endif
         return std::experimental::optional<Substitution>();
     }
 }

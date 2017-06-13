@@ -3,7 +3,7 @@ Prolog grammar:
 Ignore whitespaces, new lines, tabs.
 
 Program = Rule*
-Rule = Exp (":-" Exps)? "."
+Rule = Func (":-" Exps)? "."
 
 Exps = Exp ("," Exp)*
 Exp = Var | Func

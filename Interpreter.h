@@ -51,5 +51,15 @@ private:
     /**
      * Applies mgu to query and definite clause, unifies both and removes the resolved literal.
      */
-    ExpsT unify(const ExpsT& query, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& definiteClause, const Substitution& mgu) const;
+    static ExpsT unify(const ExpsT& query, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& definiteClause, const Substitution& mgu);
+
+    /**
+     * Checks whether exps contains an expression equal to exp.
+     */
+    static bool contains(const ExpsT& exps, std::shared_ptr<Expression> exp);
+
+    /**
+     * Retrieves all variables from all expressions in exps.
+     */
+    static std::set<std::string> getVariableNames(const ExpsT& exps);
 };
