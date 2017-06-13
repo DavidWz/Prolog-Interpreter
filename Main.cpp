@@ -15,12 +15,7 @@ int main(int argc, const char* argv[]) {
             Parser parser(inputFileStream);
             program = parser.parseProgram();
             inputFileStream.close();
-            if (parser.isSuccessful()) {
-#ifdef DEBUG
-                std::cout << *program << std::endl;
-#endif
-            }
-            else {
+            if (!parser.isSuccessful()) {
                 return 0;
             }
         }
@@ -52,13 +47,33 @@ int main(int argc, const char* argv[]) {
             Parser queryParser(inputLine);
             ExpsT query = queryParser.parseQuery();
             if (queryParser.isSuccessful()) {
-                std::experimental::optional<Substitution> answer = interpreter.evaluate(query);
-                if (answer) {
-                    std::cout << "True. " << *answer << std::endl;
-                }
-                else {
-                    std::cout << "False." << std::endl;
-                }
+                interpreter.init(query);
+
+                bool getNext = false;
+                do {
+                    std::experimental::optional<Substitution> answer = interpreter.nextAnswer();
+
+                    if (answer) {
+                        std::cout << "True. " << *answer;
+                    } else {
+                        std::cout << "False." << std::endl;
+                        break;
+                    }
+
+                    if (interpreter.hasNext()) {
+                        std::string inputChar;
+                        std::getline(std::cin, inputChar);
+                        if (inputChar[0] == ',') {
+                            getNext = true;
+                        }
+                        else {
+                            getNext = false;
+                        }
+                    }
+                    else {
+                        std::cout << std::endl;
+                    }
+                } while(getNext);
             }
             VariablePool::resetToRememberedState();
         }

@@ -5,31 +5,51 @@
 #include "ast/Program.h"
 #include "ast/Expression.h"
 
+class Configuration {
+public:
+    ExpsT query; 
+    Substitution answer;
+
+    Configuration(const ExpsT& query, const Substitution& answer) :
+        query(query),
+        answer(answer)
+    {
+    }
+
+    Configuration(const ExpsT& query) : 
+        query(query),
+        answer()
+    {
+    }
+};
+
 class Interpreter {
 private:
     std::shared_ptr<Program> mProgram;
+    std::stack<Configuration> mSearchStack;
+    std::set<std::string> mOrigVars;
 
 public:
     Interpreter(std::shared_ptr<Program> program);
 
     /**
-     * Evaluates the given query under the program of this interpreter.
-     * @param query the query that should be evaluated
-     * @return the answer substitution if the query is true, empty otherwise
+     * Sets the query that should be evaluated.
      */
-    std::experimental::optional<Substitution> evaluate(const ExpsT& query) const;
+    void init(const ExpsT& query);
+
+    /**
+     * Evaluates the query and returns the next found answer.
+     */
+    std::experimental::optional<Substitution> nextAnswer();
+
+    /**
+     * Whether there might be a next answer.
+     */
+    bool hasNext();
 
 private:
     /**
-     * Applies mgu to left and right expressions and returns a list containing both. 
+     * Applies mgu to query and definite clause, unifies both and removes the resolved literal.
      */
-    ExpsT unify(const ExpsT& left, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& right, const Substitution& mgu) const;
-
-    /**
-     * Evaluates the given query assuming a previous answer substitution.
-     * @param query the query
-     * @param currentAnswer the current answer substitution
-     * @return the final answer substitution if the query is true, empty otherwise 
-     */
-    std::experimental::optional<Substitution> evaluate(const ExpsT& query, const Substitution& currentAnswer) const;
+    ExpsT unify(const ExpsT& query, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& definiteClause, const Substitution& mgu) const;
 };

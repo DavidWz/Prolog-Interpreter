@@ -6,6 +6,6 @@
 #include <string>
 #include <experimental/optional>
 #include <set>
+#include <stack>
     
 #define ExpsT std::vector<std::shared_ptr<Expression>>
-//#define DEBUG
