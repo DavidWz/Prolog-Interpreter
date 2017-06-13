@@ -120,18 +120,18 @@ bool contains(const ExpsT& exps, std::shared_ptr<Expression> exp) {
 ExpsT Interpreter::unify(const ExpsT& left, std::shared_ptr<Expression> resolvedLiteral, const ExpsT& right, const Substitution& mgu) const {
     ExpsT result;
 
+    for (int i = 0; i < (int) right.size(); i++) {
+        std::shared_ptr<Expression> exp = mgu.applyTo(right[i]);
+        if (!contains(result, exp)) {
+            result.push_back(exp);
+        }
+    }
     for (int i = 0; i < (int) left.size(); i++) {
         if (left[i] != resolvedLiteral) {
             std::shared_ptr<Expression> exp = mgu.applyTo(left[i]);
             if (!contains(result, exp)) {
                 result.push_back(exp);
             }
-        }
-    }
-    for (int i = 0; i < (int) right.size(); i++) {
-        std::shared_ptr<Expression> exp = mgu.applyTo(right[i]);
-        if (!contains(result, exp)) {
-            result.push_back(exp);
         }
     }
 
