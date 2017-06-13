@@ -54,7 +54,7 @@ int main(int argc, const char* argv[]) {
                     std::experimental::optional<Substitution> answer = interpreter.nextAnswer();
 
                     if (answer) {
-                        std::cout << "True. " << *answer;
+                        std::cout << *answer << " ";
                     } else {
                         std::cout << "False." << std::endl;
                         break;
@@ -63,7 +63,7 @@ int main(int argc, const char* argv[]) {
                     if (interpreter.hasNext()) {
                         std::string inputChar;
                         std::getline(std::cin, inputChar);
-                        if (inputChar[0] == ',') {
+                        if (inputChar[0] == ';') {
                             getNext = true;
                         }
                         else {
