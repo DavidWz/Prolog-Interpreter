@@ -42,7 +42,6 @@ std::shared_ptr<Expression> Substitution::applyTo(std::shared_ptr<Expression> ex
     }
     else {
         // Error
-        assert(false);
         return std::shared_ptr<Expression>();
     }
 }

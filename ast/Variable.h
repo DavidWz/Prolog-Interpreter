@@ -18,10 +18,6 @@ public:
     Variable(const std::string& name) :
         mName(name)
     {
-        assert(!mName.empty() && std::isupper(mName[0]));
-        for (int i=0; i<(int)mName.size(); i++) {
-            assert(std::isalnum(mName[i]));
-        }
         VariablePool::add(mName);
     }
 

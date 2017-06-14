@@ -34,8 +34,8 @@ public:
         int i = 0;
         int last = (int) s.mVarMap.size() - 1;
 
-        if (last == 0) {
-            std::cout << "True." << std::endl;
+        if (last < 0) {
+            std::cout << "True.";
         }
         else {
             for (auto mapEntry : s.mVarMap) {

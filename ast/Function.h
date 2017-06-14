@@ -4,11 +4,12 @@
 #include <iostream>
 #include <cctype>
 #include "Expression.h"
+#include "Variable.h"
 
 /**
  * Represents a function.
  * A function is a function name followed by a list of expressions in parenthesis.
- * Function names have the form: [a-z][a-zA-Z0-9]*
+ * Function names have the form: [a-z][a-zA-Z0-9]* or "[]" or "." in the case of lists.
  */
 class Function : public Expression {
 private:
@@ -20,10 +21,14 @@ public:
         mName(name),
         mExpressions(exps)
     {
-        assert(!mName.empty() && std::islower(mName[0]));
-        for (int i=0; i<(int) mName.size(); i++) {
-            assert(std::isalnum(mName[i]));
-        }
+    }
+
+    Function(const std::string& name, std::shared_ptr<Expression> exp1, std::shared_ptr<Expression> exp2) :
+        mName(name),
+        mExpressions()
+    {
+        mExpressions.push_back(exp1);
+        mExpressions.push_back(exp2);
     }
 
     std::string getName() const {
@@ -54,9 +59,33 @@ public:
 
 protected:
     void print(std::ostream& os) const {
-        os << mName;
-        if (!mExpressions.empty()) {
-            os << "(" << mExpressions << ")";
+        // pretty printing for lists
+        if (mName == ".") {
+            os << "[" << *(mExpressions[0]);
+            std::shared_ptr<Expression> tail = mExpressions[1];
+            bool hasNext = true;
+            while (hasNext) {
+                if (std::shared_ptr<Variable> var = std::dynamic_pointer_cast<Variable>(tail)) {
+                    os << " | " << *var << "]";
+                    hasNext = false;
+                }
+                else if (std::shared_ptr<Function> func = std::dynamic_pointer_cast<Function>(tail)) {
+                    if (func->mName == "[]") {
+                        os << "]";
+                        hasNext = false;
+                    }
+                    else {
+                        os << ", " << *(func->mExpressions[0]);
+                        tail = func->mExpressions[1];
+                    }
+                }
+            }
+        }
+        else {
+            os << mName;
+            if (!mExpressions.empty()) {
+                os << "(" << mExpressions << ")";
+            }
         }
     }
 

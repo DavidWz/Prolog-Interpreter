@@ -6,8 +6,9 @@ Program = Rule*
 Rule = Func (":-" Exps)? "."
 
 Exps = Exp ("," Exp)*
-Exp = Var | Func
+Exp = Var | Func | List
 
 Func = FuncName ("(" Exps ")")?
 Var = [A-Z][a-zA-Z0-9]*
 FuncName = [a-z][a-zA-Z0-9]*
+List = "[]" | ".(" Exp "," (List | Var) ")" | "[" Exps ("|" (List | Var))? "]"

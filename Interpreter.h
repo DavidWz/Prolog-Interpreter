@@ -4,6 +4,7 @@
 #include "Substitution.h"
 #include "ast/Program.h"
 #include "ast/Expression.h"
+#include <stack>
 
 class Configuration {
 public:

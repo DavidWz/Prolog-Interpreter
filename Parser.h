@@ -35,6 +35,7 @@ private:
     ExpsT parseExpressions();
     std::shared_ptr<Function> parseFunction();
     std::shared_ptr<Variable> parseVariable();
+    std::shared_ptr<Function> parseList();
 
     // skips whitespaces etc
     void skipIgnoredChars();

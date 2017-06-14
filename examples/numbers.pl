@@ -25,8 +25,8 @@ divisible(X, Y) :- div(X, Y, Z, o).
 notDivisible(X, Y) :- div(X, Y, Z, R), smaller(o, R).
 
 divisors(X, XS) :- divisrs(X, XS, s(o)).
-divisrs(X, nil, I) :- smaller(X, I).
-divisrs(X, ls(Y, XS), I) :- smallerEqual(I, X), notDivisible(X, I), divisrs(X, ls(Y, XS), s(I)).
-divisrs(X, ls(I, XS), I) :- smallerEqual(I, X), divisible(X, I), divisrs(X, XS, s(I)).
+divisrs(X, [], I) :- smaller(X, I).
+divisrs(X, [I|XS], I) :- smallerEqual(I, X), divisible(X, I), divisrs(X, XS, s(I)).
+divisrs(X, [Y|XS], I) :- smallerEqual(I, X), notDivisible(X, I), divisrs(X, [Y|XS], s(I)).
 
-isPrime(X) :- divisors(X, ls(s(o), ls(X, nil))).
+isPrime(X) :- divisors(X, [s(o), X]).

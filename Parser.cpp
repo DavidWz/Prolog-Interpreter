@@ -114,9 +114,12 @@ std::shared_ptr<Expression> Parser::parseExpression() {
     else if (islower(peek())) {
         exp = parseFunction();
     }
+    else if (peek() == '.' || peek() == '[') {
+        exp = parseList();
+    }
     else {
         std::ostringstream oss;
-        oss << "Expected variable or function declaration, but got '" << peek() << "'.";
+        oss << "Expected variable, function, or list declaration, but got '" << peek() << "'.";
         fail(oss.str());
     }
 
@@ -126,7 +129,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 ExpsT Parser::parseExpressions() {
     skipIgnoredChars();
 
-    std::vector<std::shared_ptr<Expression>> exps;
+    ExpsT exps;
 
     exps.push_back(parseExpression());
 
@@ -197,4 +200,83 @@ std::shared_ptr<Variable> Parser::parseVariable() {
     }
 
     return var;
+}
+
+std::shared_ptr<Function> Parser::parseList() {
+    skipIgnoredChars();
+
+    std::shared_ptr<Function> func;
+    ExpsT exps;
+
+    if (peek() == '.') {
+        // .(Exp, List)
+        consume('.');
+        consume('(');
+
+        exps.push_back(parseExpression());
+        skipIgnoredChars();
+
+        consume(',');
+        skipIgnoredChars();
+
+        if (isupper(peek())) {
+            exps.push_back(parseVariable());
+        }
+        else if (peek() == '.' || peek() == '[') {
+            exps.push_back(parseList());
+        }
+        else {
+            std::ostringstream oss;
+            oss << "Expected variable or list declaration, but got '" << peek() << "'.";
+            fail(oss.str());
+        }
+
+        consume(')');
+
+        func = std::make_shared<Function>(".", exps);
+    }
+    else {
+        consume('[');
+
+        if (peek() == ']') {
+            consume(']');
+            // []
+            func = std::make_shared<Function>("[]", exps);
+        }
+        else {
+            //   [exp1, exp2, ..., expn | tail]
+            ExpsT listMembers = parseExpressions();
+            skipIgnoredChars();
+            
+            std::shared_ptr<Expression> tail;
+            if (peek() == '|') {
+                consume('|');
+                skipIgnoredChars();
+                
+                if (isupper(peek())) {
+                    tail = parseVariable();
+                }
+                else if (peek() == '.' || peek() == '[') {
+                    tail = parseList();
+                }
+                else {
+                    std::ostringstream oss;
+                    oss << "Expected variable or list declaration, but got '" << peek() << "'.";
+                    fail(oss.str());
+                }
+            }
+            else {
+                tail = std::make_shared<Function>("[]", exps);
+            }
+            consume(']');
+
+            //=> .(exp1, .(exp2, .(... .(expn, tail) ...)))
+            func = std::make_shared<Function>(".", listMembers[(int)listMembers.size()-1], tail);
+            for (int i = (int) listMembers.size() - 2; i >= 0; i--) {
+                func = std::make_shared<Function>(".", listMembers[i], func);
+            }
+        }
+    }
+
+    return func;
 }
