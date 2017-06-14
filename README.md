@@ -1,7 +1,7 @@
 # Prolog-Interpreter
 This is a simple prolog interpreter written in C++.  
 It only supports the very basics of prolog, i.e. no `not`, `;`, etc.  
-Currently, it also does no support numbers. So you have to define them yourself, too. (see examples/numbers.pl)  
+Currently, it also does not support numbers. So you have to define them yourself, too. (see examples/numbers.pl)  
 Some runnable example programs can be found in the `examples` folder.  
 
 # Getting started
