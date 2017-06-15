@@ -17,6 +17,12 @@ private:
     std::vector<std::shared_ptr<Expression>> mExpressions;
 
 public:
+    Function(const std::string& name) :
+        mName(name),
+        mExpressions()
+    {
+    }
+
     Function(const std::string& name, const std::vector<std::shared_ptr<Expression>> exps) :
         mName(name),
         mExpressions(exps)
@@ -79,6 +85,28 @@ protected:
                         tail = func->mExpressions[1];
                     }
                 }
+            }
+        }
+        else if (mName == "i8") {
+            int8_t n = 0;
+            int k = 1;
+            bool hasVar = false;
+            for (int i = (int)mExpressions.size()-1; i >= 0; i--) {
+                if (mExpressions[i]->getName() == "b1") {
+                    n += k;
+                }
+                else if(mExpressions[i]->getName() != "b0") {
+                    hasVar = true;
+                    break;
+                }
+                k <<= 1;
+            }
+
+            if (hasVar) {
+                os << mName << "(" << mExpressions << ")";
+            }
+            else {
+                os << (int) n;
             }
         }
         else {

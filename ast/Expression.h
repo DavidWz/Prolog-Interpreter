@@ -8,6 +8,7 @@
  */
 class Expression {
 public:
+    virtual std::string getName() const = 0;
     virtual bool contains(const std::string& var) const = 0;
     virtual std::set<std::string> getVariableNames() const = 0;
 

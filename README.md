@@ -1,8 +1,8 @@
 # Prolog-Interpreter
 This is a simple prolog interpreter written in C++.  
 It only supports the very basics of prolog, i.e. no `not`, `;`, etc.  
-Currently, it also does not support numbers. So you have to define them yourself, too. (see examples/numbers.pl)  
-Some runnable example programs can be found in the `examples` folder.  
+Currently, only 8-bit signed integer data types are natively supported. However they will simply be parsed to a function called `i8` with 8 arguments for every bit (either `b0` or `b1`). Basic functions on those integers are defined in `examples/int.pl`.  
+Some other runnable example programs can be found in the `examples` folder as well.  
 
 # Getting started
 Compile the prolog interpreter by simply calling `make`.  

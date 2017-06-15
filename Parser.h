@@ -36,6 +36,7 @@ private:
     std::shared_ptr<Function> parseFunction();
     std::shared_ptr<Variable> parseVariable();
     std::shared_ptr<Function> parseList();
+    std::shared_ptr<Function> parseInteger();
 
     // skips whitespaces etc
     void skipIgnoredChars();

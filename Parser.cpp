@@ -78,6 +78,7 @@ std::shared_ptr<Program> Parser::parseProgram() {
     while (hasNext()) {
         std::shared_ptr<Rule> rule = parseRule();
         rules.push_back(rule);
+        skipIgnoredChars();
     }
 
     return std::make_shared<Program>(rules);
@@ -117,9 +118,12 @@ std::shared_ptr<Expression> Parser::parseExpression() {
     else if (peek() == '.' || peek() == '[') {
         exp = parseList();
     }
+    else if (peek() == '-' || isdigit(peek())) {
+        exp = parseInteger();
+    }
     else {
         std::ostringstream oss;
-        oss << "Expected variable, function, or list declaration, but got '" << peek() << "'.";
+        oss << "Expected expression, but got '" << peek() << "'.";
         fail(oss.str());
     }
 
@@ -241,7 +245,7 @@ std::shared_ptr<Function> Parser::parseList() {
         if (peek() == ']') {
             consume(']');
             // []
-            func = std::make_shared<Function>("[]", exps);
+            func = std::make_shared<Function>("[]");
         }
         else {
             //   [exp1, exp2, ..., expn | tail]
@@ -266,7 +270,7 @@ std::shared_ptr<Function> Parser::parseList() {
                 }
             }
             else {
-                tail = std::make_shared<Function>("[]", exps);
+                tail = std::make_shared<Function>("[]");
             }
             consume(']');
 
@@ -276,6 +280,49 @@ std::shared_ptr<Function> Parser::parseList() {
                 func = std::make_shared<Function>(".", listMembers[i], func);
             }
         }
+    }
+
+    return func;
+}
+
+std::shared_ptr<Function> Parser::parseInteger() {
+    skipIgnoredChars();
+
+    std::shared_ptr<Function> func;
+
+    std::string numberStr = "";
+
+    if (peek() == '-') {
+        numberStr += consume();
+    }
+    
+    if (isdigit(peek())) {
+        do {
+            numberStr += consume();
+        } while(isdigit(peek()));
+
+        constexpr int numBits = 8;
+        int8_t number = std::stoi(numberStr);
+
+        ExpsT bits;
+        for (int i = 0; i < numBits; i++) {
+            int b = number & (1 << (numBits-i-1));
+            std::shared_ptr<Function> bit;
+            if (b == 0) {
+                bit = std::make_shared<Function>("b0");
+            }
+            else {
+                bit = std::make_shared<Function>("b1");
+            }
+            bits.push_back(bit);
+        }
+
+        func = std::make_shared<Function>("i8", bits);
+    }
+    else {
+        std::ostringstream oss;
+        oss << "Expected digit but got '" << peek() << "'.";
+        fail(oss.str());
     }
 
     return func;
